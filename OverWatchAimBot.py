@@ -170,30 +170,37 @@ bbox={'width':100,'left':100,'height':100,'top':100}
 		im.putpixel((int(xloc[i]),int(yloc[i])),(255, 0, 0)) # makes pixels red where line exists
 	im.show()
 
-def CursorSnap(xloc,yloc,bbox):
-	'''
-This function performes a relative mouse movement based on the location of the
-red outline.
-It finds the average x and y coordinate, and moves the mouse there
+def CursorSnap(xloc, yloc, bbox):
+    '''
+    This function performs a relative mouse movement based on the location of the
+    red outline.
+    It finds the highest y coordinate and moves the mouse to that location minus 10 pixels.
 
-Inputs:
-###
-xloc: the x coordinates of the pixels containing the red outline
-Format: List
+    Inputs:
+    ###
+    xloc: the x coordinates of the pixels containing the red outline
+    Format: List
 
-yloc: the x coordinates of the pixels containing the red outline
-Format: List
+    yloc: the y coordinates of the pixels containing the red outline
+    Format: List
 
-bbox: the area of the screen to capture
-format: dictionary {'width':,'left':,'height':,'top':}
-Example:
-bbox={'width':100,'left':100,'height':100,'top':100}
-###
-	'''
-	xavg=sum(xloc)/len(xloc)
-	yavg=sum(yloc)/len(yloc)
-	# does the acutal cursor move
-	ctypes.windll.user32.mouse_event(1, int(xavg-bbox['width']/2), int(yavg-bbox['height']/2), 0,0)
+    bbox: the area of the screen to capture
+    format: dictionary {'width':,'left':,'height':,'top':}
+    Example:
+    bbox={'width':100,'left':100,'height':100,'top':100}
+    ###
+    '''
+    if not xloc or not yloc:
+        return  # No red outline found, no cursor movement
+
+    xavg = sum(xloc) / len(xloc)
+    y_highest = min(yloc) + 20  # Find the highest y coordinate and add 20 (= move a bit lower )
+
+    # Ensure y_highest is within bounds
+    y_highest = max(0, y_highest)  # Prevent y_highest from being less than 0
+
+    # Does the actual cursor move
+    ctypes.windll.user32.mouse_event(1, int(xavg - bbox['width'] / 2), int(y_highest - bbox['height'] / 2), 0, 0)
 
 def Main(key,xbbox,ybbox,FPS=30,AutoAdjust=True,Debug=False):
 	'''
@@ -264,10 +271,10 @@ Example: False
 				time.sleep(1/FPS-(time.time()-t)) # makes sure each loop is as long as a frame
 
 if __name__ == "__main__":
-	key = 0x42 #b key
-	xbbox = 200
-	ybbox = 200
-	FPS=30
-	AutoAdjust=True
-	Debug=False
-	Main(key,xbbox,ybbox,FPS=FPS,AutoAdjust=AutoAdjust,Debug=Debug)
+    key = 0x42  # b key
+    xbbox = 200
+    ybbox = 200
+    FPS = 1000
+    AutoAdjust = True
+    Debug = False
+    Main(key, xbbox, ybbox, FPS=FPS, AutoAdjust=AutoAdjust, Debug=Debug)
